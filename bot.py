@@ -20,7 +20,7 @@ twitter = Twython(os.environ['APP_KEY'],
                   os.environ['OAUTH_TOKEN'],
                   os.environ['OAUTH_TOKEN_SECRET'])
 
-class ContraribotStreamer(TwythonStreamer):
+class TwityBoiStreamer(TwythonStreamer):
     tweet = None
     tweet_count = 0
     timer = None
@@ -38,22 +38,20 @@ class ContraribotStreamer(TwythonStreamer):
             text = html_decode.sub(lambda m: unichr(name2codepoint[m.group(1)]), data['text']).encode('utf-8')
             match = search_regex.search(text)
             if match:
-                print text
                 words = match.group(1).split()
                 words[0] = '2'
                 words[-1] = words[-1][:-1] + 'z'
                 tweet = ' '.join(word.capitalize() for word in words)
-                print tweet
 
-                #if random.randint(0,self.tweet_count) == 0 and len(text) <= 140:
-                #    self.tweet = text
-                #self.tweet_count += 1
+                if random.randint(0,self.tweet_count) == 0:
+                    self.tweet = tweet
+                self.tweet_count += 1
 
     def on_error(self, status_code, data):
         print status_code
 
     def post_tweet(self):
-        if self.tweet and False:
+        if self.tweet:
             try:
                 twitter.update_status(status=self.tweet)
             except:
@@ -63,10 +61,10 @@ class ContraribotStreamer(TwythonStreamer):
         self.timer = Timer(minutes_between_posts * 60, self.post_tweet)
         self.timer.start()
 
-streamer = ContraribotStreamer(os.environ['APP_KEY'],
-                               os.environ['APP_SECRET'],
-                               os.environ['OAUTH_TOKEN'],
-                               os.environ['OAUTH_TOKEN_SECRET'])
+streamer = TwityBoiStreamer(os.environ['APP_KEY'],
+                            os.environ['APP_SECRET'],
+                            os.environ['OAUTH_TOKEN'],
+                            os.environ['OAUTH_TOKEN_SECRET'])
 
 streamer.timer = Timer(10, streamer.post_tweet)
 streamer.timer.start()
